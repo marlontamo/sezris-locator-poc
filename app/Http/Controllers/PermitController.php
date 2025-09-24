@@ -6,6 +6,7 @@ use App\Models\Permit;
 use Illuminate\Http\Request;
 use App\Models\PermitApproval;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Storage;
 
 class PermitController extends Controller
 {
@@ -14,8 +15,8 @@ class PermitController extends Controller
      */
     public function index()
     {
-        $permits = $permits = Permit::all()->toArray();
-
+         $permits = Permit::all()->toArray();
+        
         return Inertia::render('Permits/Index', [
             'permits' => $permits
         ]);
@@ -25,17 +26,23 @@ class PermitController extends Controller
      * Show a single permit with its approvals
      */
     public function show($id)
-    {
-        $permit = Permit::with([
-                                'user',                  // creator
-                                'approvals.approver',    // approvals + approvers
-                                'uploads'
-                              ])->findOrFail($id);
-
-        return Inertia::render('Permits/Show', [
-            'permit' => $permit
-        ]);
-    }
+{
+    $permit = Permit::with([
+        'user',
+        'approvals.approver',
+        'uploads'
+    ])->findOrFail($id);
+    
+    // Map uploads to include a download_url
+    $permit->uploads->transform(function ($upload) {
+        $upload->download_url = Storage::url($upload->file_path);
+        return $upload;
+    });
+      // return $permit->id;
+    return Inertia::render('Permits/Show', [
+        'permit' => $permit,
+    ]);
+}
 
     /**
      * Update a permit approval
@@ -113,23 +120,24 @@ class PermitController extends Controller
      * Store a new permit
      */
     public function store(Request $request)
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'permit_type' => 'required|string|max:50'
-        ]);
+{
+    $validated = $request->validate([
+        'permit_type' => 'required|string|max:255',
+    ]);
 
-        Permit::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'permit_type' => $request->permit_type,
-            'user_id' => auth()->id(),
-        ]);
+   $permit = Permit::create([
+    'user_id'     => auth()->id(),
+    'permit_type' => $validated['permit_type'],
+    'status'      => 'pending',
+    'description' => 'System generated Description',
+    'created_at'  => now(),
+    'updated_at'  => now(),
+]);
 
-        return redirect()->route('permits.index')->with('success', 'Permit created successfully!');
-    }
-
+    // redirect them to the edit/show page for uploading requirements
+    return redirect()->route('requirements.show', $permit->id)
+                     ->with('success', 'Permit created. Now upload your requirements.');
+}
     /**
      * Return approval to previous step
      */
@@ -160,4 +168,5 @@ class PermitController extends Controller
 
         return redirect()->back()->with('success', 'Approval returned to previous step.');
     }
+    
 }

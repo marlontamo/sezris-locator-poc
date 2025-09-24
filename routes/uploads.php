@@ -4,6 +4,7 @@ use Livewire\Volt\Volt;
 use App\Http\Controllers\UploadController;
 use App\Models\User;
 use App\Helpers\PermitHelper;
+use Illuminate\Support\Facades\Storage;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/uploads', [UploadController::class, 'index'])->name('uploads.index');
@@ -16,9 +17,19 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('signed'); // must be signed + logged in
 });
 
-Route::get('/usercheck-uploaded',function(){
-    $user = auth()->user()->uploads()->get();
-    return dd(count($user));
+Route::get('/usercheck-uploaded', function () {
+    $uploads = auth()->user()->uploads()->get();
+    $user = auth()->user();
+
+    $uploadsWithLinks = $uploads->map(function ($upload) {
+        return [
+            'id'   => $upload->id,
+            'name' => $upload->file_name,
+            'url'  => Storage::url($upload->file_path),
+        ];
+    });
+
+    return response()->json("number of uploaded files by user:".$user->name ." is ".count($uploadsWithLinks));
 });
 Route::get('/test-validity/{days}', function ($days) {
     $expiry = PermitHelper::computeValidity((int) $days);

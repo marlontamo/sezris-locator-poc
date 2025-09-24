@@ -15,6 +15,11 @@ const mainNavItems: NavItem[] = [
         href: dashboard(),
         icon: LayoutGrid,
     },
+     {
+        title: 'Create Permit',
+        href: '/pages',
+        icon: LayoutGrid,
+    },
 ];
 
 const footerNavItems: NavItem[] = [

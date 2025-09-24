@@ -10,15 +10,13 @@
 
     <!-- Buttons row -->
     <div class="flex gap-2">
-      <!-- Select File label -->
-      <Label
+      <label
         for="file-upload"
         class="cursor-pointer px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
       >
         Select File
-      </Label>
+      </label>
 
-      <!-- Upload button -->
       <button
         @click="uploadFile"
         :disabled="!selectedFile || uploading"
@@ -42,52 +40,49 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import Label from './ui/label/Label.vue';
-import axios from 'axios';
+import { ref } from 'vue'
+import { router } from '@inertiajs/vue3'
 
 const props = defineProps({
-  uploadUrl: { type: String, required: true }
-});
+  uploadUrl: { type: String, required: true },
+  permitId: { type: Number, required: true }
+})
 
-const fileName = ref('');
-const selectedFile = ref(null);
-const uploadProgress = ref(0);
-const uploading = ref(false);
+const fileName = ref('')
+const selectedFile = ref(null)
+const uploadProgress = ref(0)
+const uploading = ref(false)
 
 function handleFileChange(event) {
-  const file = event.target.files[0];
+  const file = event.target.files[0]
   if (file) {
-    fileName.value = file.name;
-    selectedFile.value = file;
+    fileName.value = file.name
+    selectedFile.value = file
   }
 }
 
-async function uploadFile() {
-  if (!selectedFile.value) return;
+function uploadFile() {
+  if (!selectedFile.value) return
 
-  uploading.value = true;
-  const formData = new FormData();
-  formData.append('file', selectedFile.value);
+  uploading.value = true
 
-  try {
-    const response = await axios.post(props.uploadUrl, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-      onUploadProgress: progressEvent => {
-        uploadProgress.value = Math.round(
-          (progressEvent.loaded * 100) / progressEvent.total
-        );
-      }
-    });
+  const formData = new FormData()
+  formData.append('file', selectedFile.value)
+  formData.append('permit_id', props.permitId) // ✅ attach permit_id
 
-    console.log('Upload successful:', response.data);
-    fileName.value = '';
-    selectedFile.value = null;
-    uploadProgress.value = 0;
-  } catch (error) {
-    console.error('Upload failed:', error);
-  } finally {
-    uploading.value = false;
-  }
+  router.post(props.uploadUrl, formData, {
+    forceFormData: true,
+    onProgress: (progress) => {
+      uploadProgress.value = Math.round(progress.percentage ?? 0)
+    },
+    onSuccess: () => {
+      fileName.value = ''
+      selectedFile.value = null
+      uploadProgress.value = 0
+    },
+    onFinish: () => {
+      uploading.value = false
+    }
+  })
 }
 </script>

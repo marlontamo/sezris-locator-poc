@@ -20,25 +20,25 @@ class PermitSeeder extends Seeder
         );
 
         $approver1 = User::firstOrCreate(
-            ['email' => 'depthead@example.com'],
+            ['email' => 'chris@jhmc.com'],
             [
-                'name' => 'Department Head',
+                'name' => 'OSAC Processor',
                 'password' => bcrypt('password')
             ]
         );
 
         $approver2 = User::firstOrCreate(
-            ['email' => 'engineer@example.com'],
+            ['email' => 'gerald@jhmc.com'],
             [
-                'name' => 'City Engineer',
+                'name' => 'SEZAD MANAGER',
                 'password' => bcrypt('password')
             ]
         );
 
         $approver3 = User::firstOrCreate(
-            ['email' => 'mayor@example.com'],
+            ['email' => 'noel@jhmc.com'],
             [
-                'name' => 'Mayor',
+                'name' => 'CCO Inspector',
                 'password' => bcrypt('password')
             ]
         );

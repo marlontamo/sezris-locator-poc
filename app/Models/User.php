@@ -45,4 +45,8 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function uploads()
+     {
+    return $this->hasMany(\App\Models\Upload::class, 'user_id');
+     }
 }

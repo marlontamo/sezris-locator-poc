@@ -38,29 +38,21 @@ class UploadController extends Controller
     // Handle file upload
     public function store(Request $request)
     {   
-    $request->validate([
-        'file' => 'required|file|max:5120', // max 5MB
-    ]);
-
     $file = $request->file('file');
-
-    // Save the file to storage/app/public/uploads
     $path = $file->store('uploads', 'public');
 
-    // Save file details to the database
     $upload = Upload::create([
-        'file_name' => $file->getClientOriginalName(), // original name
-        'file_path' => $path,                          // storage path
-        'file_type' => $file->getClientMimeType(),     // MIME type
-        'file_size' => $file->getSize(),               // size in bytes
-        'user_id'   => auth()->id(),                   // user who uploaded
-        'description' => null                           // optional
+        'file_name' => $file->getClientOriginalName(),
+        'file_path' => $path,
+        'file_type' => $file->getClientMimeType(),
+        'file_size' => $file->getSize(),
+        'user_id'   => auth()->id(),
+        'permit_id' => $request->input('permit_id'),
     ]);
 
-    // Return JSON response for Axios
-    return response()->json([
-        'message' => 'File uploaded successfully!',
-        'upload' => $upload
+    return back()->with([
+        'success' => 'File uploaded successfully!',
+        'upload'  => $upload,
     ]);
     }
 

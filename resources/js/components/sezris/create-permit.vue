@@ -1,73 +1,97 @@
 <script setup>
+import { Head, useForm } from '@inertiajs/inertia-vue3'
+import Input from '../ui/input/Input.vue'
+import Label from '../ui/label/Label.vue'
+import { Button } from "@/components/ui/button"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select" 
+import FileUpload from '../FileUpload.vue'
 
-import { Head, useForm } from '@inertiajs/inertia-vue3';
 
 const form = useForm({
   title: '',
   description: '',
   permit_type: ''
-});
+})
+
+// Options for the Select
+const permitOptions = [
+  { label: 'Permit to Bring In', value: 'Permit to Bring In' },
+  { label: 'Permit to Bring Out', value: 'Permit to Bring Out' },
+  { label: 'GatePass', value: 'GatePass' },
+]
 
 function submit() {
   form.post('/permits', {
     onSuccess: () => form.reset(),
-  });
+  })
 }
 </script>
 
 <template>
-  
-    <Head title="Create Permit" />
-      <div class="p-4 max-w-3xl mx-auto w-full">
-  <h1 class="text-2xl font-bold mb-4">Create Permit</h1>
+  <Head title="Create Permit" />
 
-  <form @submit.prevent="submit" class="space-y-4">
-    <!-- Title Field -->
-    <div>
-      <label class="block mb-1 font-medium">Title</label>
-      <input
-        v-model="form.title"
-        type="text"
-        class="w-full border px-3 py-2 rounded"
-      />
-      <span class="text-red-500 text-sm" v-if="form.errors.title">{{ form.errors.title }}</span>
-    </div>
+  <div class="p-4 max-w-3xl mx-auto w-[3/12]">
+    <h1 class="text-2xl font-bold mb-4">Create Permit</h1>
 
-    <!-- Description Field -->
-    <div>
-      <label class="block mb-1 font-medium">Description</label>
-      <textarea
-        v-model="form.description"
-        class="w-full border px-3 py-2 rounded"
-      ></textarea>
-      <span class="text-red-500 text-sm" v-if="form.errors.description">{{ form.errors.description }}</span>
-    </div>
+    <form @submit.prevent="submit" class="space-y-4">
 
-    <!-- Permit Type Dropdown -->
-    <div>
-      <label class="block mb-1 font-medium">Permit Type</label>
-      <select
-        v-model="form.permit_type"
-        class="w-full border px-3 py-2 rounded"
+      <!-- Title Field -->
+      <div>
+        <Label>Title</Label>
+        <Input v-model="form.title" placeholder="Enter permit title" />
+        <span class="text-red-500 text-sm" v-if="form.errors.title">{{ form.errors.title }}</span>
+      </div>
+
+      <!-- Description Field -->
+      <div>
+        <Label>Description</Label>
+        <Input v-model="form.description" placeholder="Enter description" />
+        <span class="text-red-500 text-sm" v-if="form.errors.description">{{ form.errors.description }}</span>
+      </div>
+
+      <!-- Permit Type Dropdown using Starter Kit Select -->
+      <div>
+        <Label>Permit Type</Label>
+        <Select>
+    <SelectTrigger class="w-full">
+      <SelectValue placeholder="Permit Type" />
+    </SelectTrigger>
+    <SelectContent>
+      <SelectGroup>
+        <SelectLabel>Fruits</SelectLabel>
+        <SelectItem value="GatePass">
+          GatePass
+        </SelectItem>
+        <SelectItem value="Permit-to-bring-In">
+         Permit to Bring-In
+        </SelectItem>
+        <SelectItem value="Permit-to-bring-out">
+          Permit to Bring-Out
+        </SelectItem>
+      </SelectGroup>
+    </SelectContent>
+  </Select>
+        <span class=" w-full text-red-500 text-sm" v-if="form.errors.permit_type">{{ form.errors.permit_type }}</span>
+      </div>
+
+      <!-- Submit Button -->
+      <Button
+        type="submit"
+        :disabled="form.processing"
+        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
       >
-        <option value="" disabled>Select a permit type</option>
-        <option value="Permit to Bring In">Permit to Bring In</option>
-        <option value="Permit to Bring Out">Permit to Bring Out</option>
-        <option value="GatePass">GatePass</option>
-      </select>
-      <span class="text-red-500 text-sm" v-if="form.errors.permit_type">{{ form.errors.permit_type }}</span>
-    </div>
-
-    <!-- Submit Button -->
-    <button
-      type="submit"
-      :disabled="form.processing"
-      class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-    >
-      {{ form.processing ? 'Submitting...' : 'Create Permit' }}
-    </button>
-  </form>
-</div>
-
+        {{ form.processing ? 'Submitting...' : 'Create Permit' }}
+      </Button><FileUpload/>
+    </form>
+    
+  </div>
 
 </template>

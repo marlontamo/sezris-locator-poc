@@ -15,3 +15,5 @@ require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
 require __DIR__.'/uploads.php';
 require __DIR__.'/approver.php';
+require __DIR__.'/requirements.php';
+require __DIR__.'/pages.php';
