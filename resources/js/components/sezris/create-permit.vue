@@ -66,7 +66,7 @@ function submit() {
     </SelectTrigger>
     <SelectContent>
       <SelectGroup>
-        <SelectLabel>Fruits</SelectLabel>
+        <SelectLabel>Permit Types</SelectLabel>
         <SelectItem value="GatePass">
           GatePass
         </SelectItem>
